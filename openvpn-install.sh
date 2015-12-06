@@ -9,19 +9,19 @@
 
 
 if [[ "$EUID" -ne 0 ]]; then
-	echo "Sorry, you need to run this as root"
+	echo "Thanh nien oi ,ban can chay no bang user Root --> go sudo -s "
 	exit 1
 fi
 
 
 if [[ ! -e /dev/net/tun ]]; then
-	echo "TUN/TAP is not available"
+	echo "TUN/TAP khong co san"
 	exit 2
 fi
 
 
 if grep -qs "CentOS release 5" "/etc/redhat-release"; then
-	echo "CentOS 5 is too old and not supported"
+	echo "CentOS 5 qua cu va khong ho tro"
 	exit 3
 fi
 
@@ -34,7 +34,7 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	# Needed for CentOS 7
 	chmod +x /etc/rc.d/rc.local
 else
-	echo "Looks like you aren't running this installer on a Debian, Ubuntu or CentOS system"
+	echo "Toi thich ban chay va cai dat no  tren Debian, Ubuntu  CentOS system"
 	exit 4
 fi
 
@@ -66,26 +66,26 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 	while :
 	do
 	clear
-		echo "Looks like OpenVPN is already installed"
+		echo "HuyNK.VN se giup ban cai OpenVPN "
 		echo ""
-		echo "What do you want to do?"
-		echo "   1) Add a cert for a new user"
-		echo "   2) Revoke existing user cert"
-		echo "   3) Remove OpenVPN"
-		echo "   4) Exit"
+		echo "Ban muon lam gi bay gio ?"
+		echo "   1) Them user moi"
+		echo "   2) Xoa user da co"
+		echo "   3) Go bo OpenVPN"
+		echo "   4) Thoat"
 		read -p "Select an option [1-4]: " option
 		case $option in
 			1) 
 			echo ""
-			echo "Tell me a name for the client cert"
-			echo "Please, use one word only, no special characters"
+			echo "Go cho toi ten user"
+			echo "Vui long, chi su dong 1 ky tu khong phai so, khong phai ky tu dac biet"
 			read -p "Client name: " -e -i client CLIENT
 			cd /etc/openvpn/easy-rsa/
 			./easyrsa build-client-full $CLIENT nopass
 			# Generates the custom client.ovpn
 			newclient "$CLIENT"
 			echo ""
-			echo "Client $CLIENT added, certs available at ~/$CLIENT.ovpn"
+			echo "Client $CLIENT da co , No nam tai thu muc root ~/$CLIENT.ovpn"
 			exit
 			;;
 			2)
@@ -94,11 +94,11 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			NUMBEROFCLIENTS=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep -c "^V")
 			if [[ "$NUMBEROFCLIENTS" = '0' ]]; then
 				echo ""
-				echo "You have no existing clients!"
+				echo "Ban chua co bat ky 1 client nao!"
 				exit 5
 			fi
 			echo ""
-			echo "Select the existing client certificate you want to revoke"
+			echo "Chon client ma ban muon Xoa"
 			tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
 			if [[ "$NUMBEROFCLIENTS" = '1' ]]; then
 				read -p "Select one client [1]: " CLIENTNUMBER
@@ -120,12 +120,12 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				fi
 			fi
 			echo ""
-			echo "Certificate for client $CLIENT revoked"
+			echo "Da xoa $CLIENT "
 			exit
 			;;
 			3) 
 			echo ""
-			read -p "Do you really want to remove OpenVPN? [y/n]: " -e -i n REMOVE
+			read -p "Ban co chac chan muon go bo OpenVPN? [y/n]: " -e -i n REMOVE
 			if [[ "$REMOVE" = 'y' ]]; then
 				PORT=$(grep '^port ' /etc/openvpn/server.conf | cut -d " " -f 2)
 				if pgrep firewalld; then
@@ -149,10 +149,10 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				rm -rf /etc/openvpn
 				rm -rf /usr/share/doc/openvpn*
 				echo ""
-				echo "OpenVPN removed!"
+				echo "OpenVPN da dc go bo!"
 			else
 				echo ""
-				echo "Removal aborted!"
+				echo "Go bo da dc dung!"
 			fi
 			exit
 			;;
@@ -161,21 +161,21 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 	done
 else
 	clear
-	echo 'Welcome to this quick OpenVPN "road warrior" installer'
+	echo 'Chao mung ban den voi chuong trinh tu dong cai OpenVPN "road warrior" '
 	echo ""
 	# OpenVPN setup and first user creation
-	echo "I need to ask you a few questions before starting the setup"
-	echo "You can leave the default options and just press enter if you are ok with them"
+	echo "Toi can ban tra moi 1 so cau hoi truoc khi bat dau"
+	echo "Ban  co the ra khoi day va bam enter de chuong trinh cai mac dinh "
 	echo ""
-	echo "First I need to know the IPv4 address of the network interface you want OpenVPN"
+	echo "Truoc tien toi muon biet dia chi IPV4 cua giao thuc mang ma ban muon OpenVPN"
 	echo "listening to."
 	read -p "IP address: " -e -i $IP IP
 	echo ""
-	echo "What port do you want for OpenVPN?"
+	echo "Cong ket noi cho  OpenVPN?"
 	read -p "Port: " -e -i 1194 PORT
 	echo ""
-	echo "What DNS do you want to use with the VPN?"
-	echo "   1) Current system resolvers"
+	echo "DNS nao ban muon su dung voi  VPN?"
+	echo "   1) DNS hien tai cua he thong"
 	echo "   2) OpenDNS"
 	echo "   3) Level 3"
 	echo "   4) NTT"
@@ -183,12 +183,12 @@ else
 	echo "   6) Google"
 	read -p "DNS [1-6]: " -e -i 1 DNS
 	echo ""
-	echo "Finally, tell me your name for the client cert"
-	echo "Please, use one word only, no special characters"
+	echo "Hoan thanh, go cho toi ten ban muon dat openvpn"
+	echo "Vui long ,chi su dung 1 tu duy nhat khong co ky tu dac biet"
 	read -p "Client name: " -e -i client CLIENT
 	echo ""
-	echo "Okay, that was all I needed. We are ready to setup your OpenVPN server now"
-	read -n1 -r -p "Press any key to continue..."
+	echo "Tot lam , tat ca nhung gi toi can da co. gio chung ta se cai OpenVPN server  ngay bay gio"
+	read -n1 -r -p "Bam mot phim bat ky de tiep tuc..."
 		if [[ "$OS" = 'debian' ]]; then
 		apt-get update
 		apt-get install openvpn iptables openssl ca-certificates -y
@@ -324,10 +324,10 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 	EXTERNALIP=$(wget -qO- ipv4.icanhazip.com)
 	if [[ "$IP" != "$EXTERNALIP" ]]; then
 		echo ""
-		echo "Looks like your server is behind a NAT!"
+		echo "Hinh nhu may chu cua ban nam sau 1  NAT!"
 		echo ""
-		echo "If your server is NATed (LowEndSpirit), I need to know the external IP"
-		echo "If that's not the case, just ignore this and leave the next field blank"
+		echo "Neu nhu server cua ban dang  NATed (LowEndSpirit), Toi can biet  IP mo rong"
+		echo "Neu khong dung trong truoc hop nay thi de trong buoc tiep theo va tiep tuc"
 		read -p "External IP: " -e USEREXTERNALIP
 		if [[ "$USEREXTERNALIP" != "" ]]; then
 			IP=$USEREXTERNALIP
@@ -350,8 +350,9 @@ verb 3" > /etc/openvpn/client-common.txt
 	# Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo ""
-	echo "Finished!"
+	echo "Hoan thanh!"
 	echo ""
-	echo "Your client config is available at ~/$CLIENT.ovpn"
-	echo "If you want to add more clients, you simply need to run this script another time!"
+	echo "File client ban nap o thu muc root ~/$CLIENT.ovpn"
+	echo "Neu ban can tao 1 user moi , ban chi can khoi dong lai va chay lai script nay!"
+	echo "HuynK.VN , chuc ban vui ve va ung ho minh tai huynk.vn trang cho thue Leaguesharp sub !"
 fi
